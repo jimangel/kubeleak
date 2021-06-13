@@ -1,0 +1,21 @@
+---
+- hosts: "all"
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+  connection: ssh
+  
+  tasks:
+   - name: Installing Kubernetes Cluster Packages.
+     apt: 
+       name:
+         - kubeadm={{ kubernetes_version }}
+         - kubectl={{ kubernetes_version }}
+         - kubelet={{ kubernetes_version }}
+       state: present
+       force: yes
+
+   - name: Enable service kubelet, and enable persistently
+     service: 
+       name: kubelet
+       enabled: yes

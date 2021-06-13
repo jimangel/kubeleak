@@ -1,0 +1,75 @@
+---
+- hosts: "all"
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+  connection: ssh
+  
+  tasks:
+   - name: Upgrade all apt packages
+     apt: upgrade=dist force_apt_get=yes
+   
+   - name: Make the Swap inactive
+     command: swapoff -a
+
+   - name: Remove Swap entry from /etc/fstab.
+     lineinfile:
+       dest: /etc/fstab
+       regexp: swap
+       state: absent
+
+   - name: Installing Prerequisites for Kubernetes
+     apt: 
+       name:
+         - apt-transport-https
+         - ca-certificates
+         - curl
+         - gnupg-agent
+         - vim
+         - software-properties-common
+         - jq
+       state: present
+
+   - name: Add Docker’s official GPG key
+     apt_key:
+       url: https://download.docker.com/linux/ubuntu/gpg
+       state: present
+   # we don't care a ton about Docker of the versions... let it rip!
+   - name: Add Docker Repository
+     apt_repository:
+       repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+       state: present
+       filename: docker
+       mode: 0600
+
+   - name: Install Docker Engine.
+     apt: 
+       name:
+         - docker-ce
+         - docker-ce-cli
+         - containerd.io
+       state: present
+
+   - name: Enable service docker, and enable persistently
+     service: 
+       name: docker
+       enabled: yes
+
+   - name: Add Google official GPG key
+     apt_key:
+       url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+       state: present
+
+   - name: Add Kubernetes Repository
+     apt_repository:
+       repo: deb http://apt.kubernetes.io/ kubernetes-xenial main 
+       state: present
+       filename: kubernetes
+       mode: 0600
+
+   - name: Reboot all the kubernetes nodes.
+     reboot:
+       post_reboot_delay: 10
+       reboot_timeout: 40
+       connect_timeout: 60
+       test_command: uptime

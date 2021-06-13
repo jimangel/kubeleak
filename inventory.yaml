@@ -1,0 +1,34 @@
+---
+all:
+  hosts:
+    # Use only IP addresses here!
+    node-1:
+      ansible_host: 192.168.7.101
+    node-2:
+      ansible_host: 192.168.7.102
+    node-3:
+      ansible_host: 192.168.7.103
+  children:
+    k8s_controlplane:
+      hosts:
+      # At most one controlplane:
+        node-1: {}
+    k8s_worker:
+      hosts:
+        node-2: {}
+        node-3: {}
+
+  vars:
+    ansible_user: jangel
+    ansible_python_interpreter: /usr/bin/python3
+    ansible_connection: ssh
+
+    # https://kubernetes.io/releases/ or `apt-cache madison kubeadm | grep 1.20`
+    kubernetes_version: "1.20.7-00"
+
+    # 192.168.0.0/16, the default, is already currently in use on my network; so I'll switch to using 172.16.0.0/12. Feel free to change...
+    # The forward slash needs to be escaped with a backslash to work 
+    pod_network_cidr: "172.16.0.0\/12"
+
+    # kubeadm config setup
+    cluster_name: "auto-ops"

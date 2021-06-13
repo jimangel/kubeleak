@@ -1,0 +1,25 @@
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+clusterName: {{ cluster_name }}
+kubernetesVersion: {{ kubernetes_version.split('-')[0] }}
+networking:
+  podSubnet: "{{ pod_network_cidr }}" # --pod-network-cidr
+apiServer:
+  extraArgs:
+    advertise-address: {{ hostvars[groups['k8s_controlplane'][0]]['ansible_default_ipv4']['address'] }}
+    default-not-ready-toleration-seconds: "30"
+    default-unreachable-toleration-seconds: "30"
+controllerManager:
+  extraArgs:
+    node-monitor-grace-period: 16s
+    node-monitor-period: 2s
+    pod-eviction-timeout: 2m30s
+    node-cidr-mask-size: "24"
+    bind-address: 0.0.0.0
+scheduler:
+  extraArgs:
+    bind-address: 0.0.0.0
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+kind: KubeProxyConfiguration
+metricsBindAddress: 0.0.0.0

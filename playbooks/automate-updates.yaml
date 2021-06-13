@@ -1,0 +1,14 @@
+---
+- hosts: "all"
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+  connection: ssh
+
+  tasks:
+   - name: Install unattended-upgrades
+     apt: 
+       name:
+         - unattended-upgrades
+         - apt-listchanges
+       state: present
