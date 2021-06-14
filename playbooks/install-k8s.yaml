@@ -12,11 +12,11 @@
    - name: Create kubeadm config file
      template:
        src: ../templates/kubeadm-config.j2
-       dest: /tmp/kubeadm-config.yaml
+       dest: /etc/kubeadm-config.yaml
      delegate_to: "{{ hostvars[groups['k8s_controlplane'][0]]['ansible_default_ipv4']['address'] }}"
 
    - name: Intilizing Kubernetes Cluster
-     command: kubeadm init --config=/tmp/kubeadm-config.yaml
+     command: kubeadm init --config=/etc/kubeadm-config.yaml
      run_once: true
      delegate_to: "{{ hostvars[groups['k8s_controlplane'][0]]['ansible_default_ipv4']['address'] }}"
 
