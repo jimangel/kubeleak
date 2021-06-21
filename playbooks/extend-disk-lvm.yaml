@@ -1,0 +1,15 @@
+---
+# IF EXPANDING THE ROOT DISK (/) USE SOMETHING LIKE https://gparted.org/livecd.php FIRST TO EXPAND THE PARTITION
+- hosts: "all"
+  become: yes
+  become_method: sudo
+  gather_facts: yes
+  connection: ssh
+  
+  tasks:
+   - name: Extend the logical volume to take all remaining space of the PVs and resize the underlying filesystem
+     lvol:
+       vg: ubuntu-vg
+       lv: ubuntu-lv
+       size: +100%FREE
+       resizefs: true
