@@ -7,7 +7,7 @@
   
   tasks:
    - name: Upgrade all apt packages
-     apt: upgrade=dist force_apt_get=yes
+     apt: upgrade=dist force_apt_get=yes update_cache=yes
    
    - name: Make the Swap inactive
      command: swapoff -a
